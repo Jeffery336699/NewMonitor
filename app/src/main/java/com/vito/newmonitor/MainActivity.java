@@ -16,41 +16,22 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private ActivityManager mManager;
     private TextView mTv;
-    private AppCompatButton mBt_other;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
-        Log.i(TAG, "onCreate: xiaomei");
-        Log.i(TAG, "onCreate: tangj");
-        Log.i(TAG, "onCreate: xiaomei---2");
-        Log.i(TAG, "onCreate: tangj-----2");
-        Log.i(TAG, "onCreate: xiaomei----3");
-        Log.i(TAG, "onCreate: xiekai----1");
-        if (mManager == null) {
-            mManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        }
-        mManager.killBackgroundProcesses(MonitorService.PACKAGE_NAME);
-
         startByNormallService();
 
     }
 
     private void initView() {
         mTv = (TextView) findViewById(R.id.tv);
-        mBt_other = (AppCompatButton) findViewById(R.id.bt_other);
-        mBt_other.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "点击了", Toast.LENGTH_SHORT).show();
 
-            }
-        });
-        mTv.setText("自助终端监控"+getVersionName());
+        mTv.setText("自助终端监控 "+getVersionName());
     }
 
     public void startByNormallService() {

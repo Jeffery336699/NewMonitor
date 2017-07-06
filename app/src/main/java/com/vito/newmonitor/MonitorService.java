@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Environment;
@@ -12,10 +13,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.wenming.library.BackgroundUtil;
+import com.wenming.library.processutil.ProcessManager;
+import com.wenming.library.processutil.models.AndroidAppProcess;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -25,11 +29,12 @@ import java.util.concurrent.Executors;
 
 public class MonitorService extends Service {
 
+    private static String TAG="MonitorService";
     private ActivityManager mManager;
     private Timer           timer;
     private List<String>    mList;
     private             boolean first        = true;
-//    public final static String  PACKAGE_NAME = "com.example.ling.installtestdemo";
+
         public final static String PACKAGE_NAME="com.smates.selfservice";
 
     @Override
@@ -42,96 +47,55 @@ public class MonitorService extends Service {
     public void onCreate() {
         super.onCreate();
         //开启监控
-//        startWatching();
         startCheck();
         setForeApp();
     }
 
+    public  List<AndroidAppProcess> getRunningForegroundApps(Context ctx) {
+        List<AndroidAppProcess> processes = new ArrayList<>();
+        File[] files = new File("/proc").listFiles();
+        PackageManager pm = ctx.getPackageManager();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                int pid;
+                try {
+                    pid = Integer.parseInt(file.getName());
+                } catch (NumberFormatException e) {
+                    continue;
+                }
+                try {
+                    AndroidAppProcess process = new AndroidAppProcess(pid);
+                    if (process.foreground
+                            && (process.uid < 1000 || process.uid > 9999)
+                            && !process.name.contains(":")
+                            && pm.getLaunchIntentForPackage(process.getPackageName()) != null) {
+                        processes.add(process);
+                    }
+                } catch (AndroidAppProcess.NotAndroidAppProcessException ignored) {
+                } catch (IOException e) {
+                    Log.e(TAG, pid+"");
 
-    private void updateProcessInfo() {
-        if (mManager == null) {
-            mManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+                }
+            }
         }
-
-        // 获取进程信息
-        List<ActivityManager.RunningAppProcessInfo> infos = mManager
-                .getRunningAppProcesses();
-        mList = new ArrayList<>();
-        for (ActivityManager.RunningAppProcessInfo info : infos) {
-            String name = info.processName;
-            mList.add(name);
-            Log.d("processName", name);
-        }
-
-        if (!mList.contains(PACKAGE_NAME)) {
-            Log.d("processName", "不包含自助终端进程");
-
-            startApp(PACKAGE_NAME);
-        } else {
-            //            if (first) {
-            //                Log.d("processName", "我进来了,");
-            //                //                mManager.killBackgroundProcesses(PACKAGE_NAME);
-            //                startApp(PACKAGE_NAME);
-            //            }
-            //TODO:这里记得解开注释
-            //            first = false;
-
-            //判断自助终端是否在前台执行,没有在前台执行就启动
-            //            Boolean isForeground = BackgroundUtil.getLinuxCoreInfo(getApplication().getApplicationContext(), PACKAGE_NAME);
-            //            Log.i("jiance", "isForeground----: " + isForeground);
-            //            if (!isForeground){
-            //                startApp(PACKAGE_NAME);
-            //            }
-        }
+        return processes;
     }
 
+    /**
+     * 把process进程信息保存在/proc目录下，使用Shell命令去获取的他，再根据进程的属性判断是否为前台
+     *
+     * @param packageName 需要检查是否位于栈顶的App的包名
+     */
+    public  boolean getLinuxCoreInfo(Context context, String packageName) {
 
-    private void startWatching() {
-        timer = new Timer();
-        TimerTask task = new TimerTask() {
-            public void run() {
-                //getTime();
-                updateProcessInfo();
+        List<AndroidAppProcess> processes = getRunningForegroundApps(context);
+        for (AndroidAppProcess appProcess : processes) {
+            if (appProcess.getPackageName().equals(packageName) && appProcess.foreground) {
+                return true;
             }
-
-        };
-        timer.schedule(task, 5000, 5 * 1000);
-
-    }
-
-    private void getTime() {
-        long mainApptime = readTime();
-        long currentTime = System.currentTimeMillis();
-        Log.i("xiaohao", "mainApptime=" + mainApptime + "");
-        Log.i("xiaohao", "currentTime=" + currentTime + "");
-        Log.i("xiaohao", "rest=" + (currentTime - mainApptime) + "");
-        if (currentTime - mainApptime > 10000) {
-            startApp(PACKAGE_NAME);
         }
-    }
+        return false;
 
-
-    private long readTime() {
-        try {
-
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "//" + "run.txt");
-            if (!file.exists()) {
-                return 0;
-            }
-            StringBuffer sb = new StringBuffer();//ok
-
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String str = "";
-            if ((str = br.readLine()) != null) {
-                sb.append(str);
-
-                return Long.parseLong(sb.toString());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return 0;
     }
 
 
@@ -141,7 +105,6 @@ public class MonitorService extends Service {
      * @param packageName
      */
     protected void startApp(String packageName) {
-        // intent
         PackageManager pm = getPackageManager();
         Intent launchIntentForPackage = pm.getLaunchIntentForPackage(packageName);
         if (launchIntentForPackage != null)
@@ -153,7 +116,6 @@ public class MonitorService extends Service {
      */
     private void setForeApp() {
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        //API level 11
         Notification.Builder builder = new Notification.Builder(getApplicationContext());
         builder.setContentTitle("monitor");
         builder.setContentText("监控进程");
@@ -176,7 +138,7 @@ public class MonitorService extends Service {
         //销毁时重新启动Service
         this.startService(localIntent);
         Toast.makeText(getApplicationContext(), "打开成功", Toast.LENGTH_LONG).show();
-        Log.i("xiaohao", "fuwu走到这了");
+        Log.d(TAG, "销毁重启服务");
     }
 
 
@@ -186,35 +148,14 @@ public class MonitorService extends Service {
         }
         TimerTask task = new TimerTask() {
             public void run() {
-                Boolean isForeground = BackgroundUtil.getLinuxCoreInfo(getApplicationContext(), PACKAGE_NAME);
-                Log.i("jiance", "isForeground----: " + isForeground);
+                Boolean isForeground = getLinuxCoreInfo(getApplicationContext(), PACKAGE_NAME);
+                Log.i(TAG, "isForeground----: " + isForeground);
                 if (!isForeground) {
                     startApp(PACKAGE_NAME);
                 }
             }
         };
-        timer.schedule(task, 5000, 20 * 1000);
-        recomdTime();
+        timer.schedule(task, 50000, 20 * 1000);
     }
 
-    private void recomdTime() {
-        ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
-        cachedThreadPool.execute(mRunnable);
-    }
-
-    public Runnable mRunnable = new Runnable() {
-        private int time;
-
-        @Override
-        public void run() {
-            while (true) {
-                Log.i("tangj", "time--jiance--" + time++);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    };
 }

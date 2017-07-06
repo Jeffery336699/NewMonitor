@@ -25,42 +25,24 @@ public class BootReceiver extends BroadcastReceiver {
             context.startActivity(mBootIntent);
         }
 
-        if(intent.getAction().equals(Intent.ACTION_PACKAGE_ADDED)){
-            if (mManager == null) {
-                mManager = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
-            }
-            mManager.killBackgroundProcesses(MonitorService.PACKAGE_NAME);
-
-            Toast.makeText(context, "有应用被添加", Toast.LENGTH_LONG).show();
-        }
-        if(intent.getAction().equals(Intent.ACTION_PACKAGE_REMOVED)){
-            if (mManager == null) {
-                mManager = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
-            }
-            mManager.killBackgroundProcesses(MonitorService.PACKAGE_NAME);
-
-            Toast.makeText(context, "有应用被删除", Toast.LENGTH_LONG).show();
-        }
-
+//        if(intent.getAction().equals(Intent.ACTION_PACKAGE_ADDED)){
+//            if (mManager == null) {
+//                mManager = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
+//            }
+//            mManager.killBackgroundProcesses(MonitorService.PACKAGE_NAME);
 //
-//        //接收广播：安装更新后，自动启动自己。
-//        if (intent.getAction().equals(Intent.ACTION_PACKAGE_ADDED) || intent.getAction().equals(Intent.ACTION_PACKAGE_REPLACED))
-//        {
-//            Log.i("vvv","ACTION_PACKAGE_ADDED ");
-//            Intent ootStartIntent = new Intent(context, MainActivity.class);
-//            ootStartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            context.startActivity(ootStartIntent);
+//            Toast.makeText(context, "有应用被添加", Toast.LENGTH_LONG).show();
+//        }
+//        if(intent.getAction().equals(Intent.ACTION_PACKAGE_REMOVED)){
+//            if (mManager == null) {
+//                mManager = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
+//            }
+//            mManager.killBackgroundProcesses(MonitorService.PACKAGE_NAME);
+//
+//            Toast.makeText(context, "有应用被删除", Toast.LENGTH_LONG).show();
 //        }
 
 
-//        if (intent.getAction().equals(Intent.ACTION_MEDIA_MOUNTED))
-//        {
-//            Log.i("vvv","ACTION_MEDIA_MOUNTED ");
-//            Intent mBootIntent = new Intent(context, MainActivity.class);
-//            //设置开机自动运行app
-//            mBootIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            context.startActivity(mBootIntent);
-//        }
 
     }
 
