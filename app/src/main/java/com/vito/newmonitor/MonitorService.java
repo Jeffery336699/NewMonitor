@@ -1,41 +1,29 @@
 package com.vito.newmonitor;
 
-import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.wenming.library.BackgroundUtil;
-import com.wenming.library.processutil.ProcessManager;
 import com.wenming.library.processutil.models.AndroidAppProcess;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class MonitorService extends Service {
 
-    private static String TAG="MonitorService";
-    private ActivityManager mManager;
-    private Timer           timer;
-    private List<String>    mList;
-    private             boolean first        = true;
-
-        public final static String PACKAGE_NAME="com.smates.selfservice";
+    private static String TAG = "MonitorService";
+    private Timer timer;
+    //    public final static String  PACKAGE_NAME = "com.example.ling.installtestdemo";
+    public final static String PACKAGE_NAME = "com.smates.selfservice";
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -47,11 +35,10 @@ public class MonitorService extends Service {
     public void onCreate() {
         super.onCreate();
         //开启监控
-        startCheck();
         setForeApp();
     }
 
-    public  List<AndroidAppProcess> getRunningForegroundApps(Context ctx) {
+    public List<AndroidAppProcess> getRunningForegroundApps(Context ctx) {
         List<AndroidAppProcess> processes = new ArrayList<>();
         File[] files = new File("/proc").listFiles();
         PackageManager pm = ctx.getPackageManager();
@@ -73,7 +60,7 @@ public class MonitorService extends Service {
                     }
                 } catch (AndroidAppProcess.NotAndroidAppProcessException ignored) {
                 } catch (IOException e) {
-                    Log.e(TAG, pid+"");
+                    Log.e(TAG, pid + "");
 
                 }
             }
@@ -86,7 +73,7 @@ public class MonitorService extends Service {
      *
      * @param packageName 需要检查是否位于栈顶的App的包名
      */
-    public  boolean getLinuxCoreInfo(Context context, String packageName) {
+    public boolean getLinuxCoreInfo(Context context, String packageName) {
 
         List<AndroidAppProcess> processes = getRunningForegroundApps(context);
         for (AndroidAppProcess appProcess : processes) {
@@ -128,17 +115,20 @@ public class MonitorService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         startCheck();
+        Log.i(TAG, "onStartCommand: -----------进来了");
         return Service.START_STICKY;
     }
 
     @Override
     public void onDestroy() {
+//        Intent localIntent = new Intent(getApplicationContext(), MonitorService.class);
+//        //销毁时重新启动Service
+//        this.startService(localIntent);
+//        Toast.makeText(getApplicationContext(), "打开成功", Toast.LENGTH_LONG).show();
+//        Log.d(TAG, "销毁重启服务");
         super.onDestroy();
-        Intent localIntent = new Intent(getApplicationContext(), MonitorService.class);
-        //销毁时重新启动Service
-        this.startService(localIntent);
-        Toast.makeText(getApplicationContext(), "打开成功", Toast.LENGTH_LONG).show();
-        Log.d(TAG, "销毁重启服务");
+        stopSelf();
+        Log.i(TAG, "销毁服务");
     }
 
 
@@ -155,7 +145,7 @@ public class MonitorService extends Service {
                 }
             }
         };
-        timer.schedule(task, 50000, 20 * 1000);
+        timer.schedule(task, 20*1000, 45 * 1000);
     }
 
 }
