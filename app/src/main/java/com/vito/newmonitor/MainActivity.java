@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initView();
         Log.i(TAG, "onCreate: xiaomei");
+        Log.i(TAG, "onCreate: tangj");
         if (mManager == null) {
             mManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         }
