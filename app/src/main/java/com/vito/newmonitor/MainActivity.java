@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "onCreate: xiaomei");
         Log.i(TAG, "onCreate: tangj");
         Log.i(TAG, "onCreate: xiaomei---2");
+        Log.i(TAG, "onCreate: tangj-----2");
         if (mManager == null) {
             mManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         }
