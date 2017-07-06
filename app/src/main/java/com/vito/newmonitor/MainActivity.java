@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        Log.i(TAG, "onCreate: xiaomei");
         if (mManager == null) {
             mManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         }
