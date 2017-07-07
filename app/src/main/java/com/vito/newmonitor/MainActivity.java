@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
@@ -51,7 +52,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        startApp("com.smates.selfservice");
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                SystemClock.sleep(5000);
+                startApp("com.smates.selfservice");
+            }
+        }.start();
+
     }
 
     protected void startApp(String packageName) {

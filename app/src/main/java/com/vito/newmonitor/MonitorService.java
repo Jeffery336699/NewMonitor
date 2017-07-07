@@ -19,11 +19,8 @@ public class MonitorService extends Service {
 
     private static String TAG = "MonitorService";
     private Timer timer;
-    //    public final static String  PACKAGE_NAME = "com.example.ling.installtestdemo";
     public final static String PACKAGE_NAME  = "com.smates.selfservice";
-    public static final String monitorFile   = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "read.txt";
-    public static final String START_MONITOR = "startMonitor";
-    public static final String STOP_MONITOR  = "stopMonitor";
+
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -35,7 +32,7 @@ public class MonitorService extends Service {
     public void onCreate() {
         super.onCreate();
         //开启监控
-        setForeApp();
+        //setForeApp();
     }
 
     /**
@@ -89,6 +86,7 @@ public class MonitorService extends Service {
         }
         TimerTask task = new TimerTask() {
             public void run() {
+
                 Boolean isForeground = BackgroundUtil.getLinuxCoreInfo(getApplicationContext(), PACKAGE_NAME);
                 Log.i(TAG, "isForeground----: " + isForeground);
                 if (!isForeground) {
@@ -96,7 +94,7 @@ public class MonitorService extends Service {
                 }
             }
         };
-        timer.schedule(task, 10 * 1000, 40 * 1000);
+        timer.schedule(task, 10 * 1000, 10 * 1000);
     }
 
 }
