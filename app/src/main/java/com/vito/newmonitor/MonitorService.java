@@ -80,7 +80,6 @@ public class MonitorService extends Service {
         super.onDestroy();
         stopSelf();
         Log.i(TAG, "销毁服务");
-
     }
 
 
@@ -90,11 +89,6 @@ public class MonitorService extends Service {
         }
         TimerTask task = new TimerTask() {
             public void run() {
-                String s = FileUtil.readFile(monitorFile);
-                Log.i(TAG, "monitorFile: " + s);
-                if (STOP_MONITOR.equals(s)) {//表示是操作人员退出的,不做一体机前后台监控
-                    return;
-                }
                 Boolean isForeground = BackgroundUtil.getLinuxCoreInfo(getApplicationContext(), PACKAGE_NAME);
                 Log.i(TAG, "isForeground----: " + isForeground);
                 if (!isForeground) {
