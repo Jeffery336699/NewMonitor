@@ -1,0 +1,2 @@
+﻿debug签名
+密码：android
