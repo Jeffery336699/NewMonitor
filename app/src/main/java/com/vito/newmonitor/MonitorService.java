@@ -3,7 +3,6 @@ package com.vito.newmonitor;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Environment;
@@ -11,12 +10,8 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.wenming.library.BackgroundUtil;
-import com.wenming.library.processutil.models.AndroidAppProcess;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -24,7 +19,8 @@ public class MonitorService extends Service {
 
     private static String TAG = "MonitorService";
     private Timer timer;
-    public final static String PACKAGE_NAME = "com.smates.selfservice";
+    //    public final static String  PACKAGE_NAME = "com.example.ling.installtestdemo";
+    public final static String PACKAGE_NAME  = "com.smates.selfservice";
     public static final String monitorFile   = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "read.txt";
     public static final String START_MONITOR = "startMonitor";
     public static final String STOP_MONITOR  = "stopMonitor";
@@ -39,7 +35,6 @@ public class MonitorService extends Service {
     public void onCreate() {
         super.onCreate();
         //开启监控
-
         setForeApp();
     }
 
@@ -78,9 +73,9 @@ public class MonitorService extends Service {
 
     @Override
     public void onDestroy() {
-        if (timer!=null){
+        if (timer != null) {
             timer.cancel();
-            timer=null;
+            timer = null;
         }
         super.onDestroy();
         stopSelf();
@@ -96,8 +91,8 @@ public class MonitorService extends Service {
         TimerTask task = new TimerTask() {
             public void run() {
                 String s = FileUtil.readFile(monitorFile);
-                Log.i(TAG, "monitorFile: "+s);
-                if (STOP_MONITOR.equals(s)){//表示是操作人员退出的,不做一体机前后台监控
+                Log.i(TAG, "monitorFile: " + s);
+                if (STOP_MONITOR.equals(s)) {//表示是操作人员退出的,不做一体机前后台监控
                     return;
                 }
                 Boolean isForeground = BackgroundUtil.getLinuxCoreInfo(getApplicationContext(), PACKAGE_NAME);
@@ -107,7 +102,7 @@ public class MonitorService extends Service {
                 }
             }
         };
-        timer.schedule(task, 10*1000, 40 * 1000);
+        timer.schedule(task, 10 * 1000, 40 * 1000);
     }
 
 }
