@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -24,6 +25,9 @@ public class MonitorService extends Service {
     private Timer timer;
     //    public final static String  PACKAGE_NAME = "com.example.ling.installtestdemo";
     public final static String PACKAGE_NAME = "com.smates.selfservice";
+    public static final String monitorFile   = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "read.txt";
+    public static final String START_MONITOR = "startMonitor";
+    public static final String STOP_MONITOR  = "stopMonitor";
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -82,7 +86,6 @@ public class MonitorService extends Service {
             }
         }
         return false;
-
     }
 
 
@@ -121,14 +124,14 @@ public class MonitorService extends Service {
 
     @Override
     public void onDestroy() {
-//        Intent localIntent = new Intent(getApplicationContext(), MonitorService.class);
-//        //销毁时重新启动Service
-//        this.startService(localIntent);
-//        Toast.makeText(getApplicationContext(), "打开成功", Toast.LENGTH_LONG).show();
-//        Log.d(TAG, "销毁重启服务");
+        if (timer!=null){
+            timer.cancel();
+            timer=null;
+        }
         super.onDestroy();
         stopSelf();
         Log.i(TAG, "销毁服务");
+
     }
 
 
@@ -138,6 +141,11 @@ public class MonitorService extends Service {
         }
         TimerTask task = new TimerTask() {
             public void run() {
+                String s = FileUtil.readFile(monitorFile);
+                Log.i(TAG, "monitorFile: "+s);
+                if (STOP_MONITOR.equals(s)){//表示是操作人员退出的,不做一体机前后台监控
+                    return;
+                }
                 Boolean isForeground = getLinuxCoreInfo(getApplicationContext(), PACKAGE_NAME);
                 Log.i(TAG, "isForeground----: " + isForeground);
                 if (!isForeground) {
@@ -145,7 +153,7 @@ public class MonitorService extends Service {
                 }
             }
         };
-        timer.schedule(task, 20*1000, 45 * 1000);
+        timer.schedule(task, 10*1000, 40 * 1000);
     }
 
 }

@@ -5,42 +5,23 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
-
-import java.io.File;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private TextView mTv;
-    private Timer timer;
-    private File mFile;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initFile();
         initView();
         startByNormallService();
         getMessage(this);
-    }
-
-    private void initFile() {
-        try {
-            mFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "read.txt");
-            if (!mFile.exists())
-                mFile.createNewFile();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private void initView() {
@@ -49,21 +30,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startByNormallService() {
-        final Intent i = new Intent(getApplicationContext(), MonitorService.class);
-        if (timer == null) {
-            timer = new Timer();
-        }
-        TimerTask task = new TimerTask() {
-            public void run() {
-                String result = FileUtils.read(mFile.getAbsolutePath());
-                if ("true".equals(result.trim())){
-                    stopService(i);
-                }else {
-                    startService(i);
-                }
-            }
-        };
-        timer.schedule(task, 20*1000, 60 * 1000);
+        Intent i = new Intent(getApplicationContext(), MonitorService.class);
+        startService(i);
     }
 
     public String getVersionName() {
