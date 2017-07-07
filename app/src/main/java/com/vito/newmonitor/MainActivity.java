@@ -51,14 +51,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                SystemClock.sleep(5000);
-                startApp("com.smates.selfservice");
-            }
-        }.start();
+        AlarmManagerUtils.startMonitor(getApplicationContext());
+//        new Thread(){
+//            @Override
+//            public void run() {
+//                super.run();
+//                SystemClock.sleep(5000);
+//                startApp("com.smates.selfservice");
+//            }
+//        }.start();
 
     }
 

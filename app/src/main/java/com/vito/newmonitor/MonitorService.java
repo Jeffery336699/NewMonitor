@@ -17,7 +17,7 @@ public class MonitorService extends Service {
 
     private static String TAG = "MonitorService";
     private Timer timer;
-    public final static String PACKAGE_NAME  = "com.smates.selfservice";
+    public final static String PACKAGE_NAME = "com.smates.selfservice";
 
 
     @Override
@@ -25,12 +25,6 @@ public class MonitorService extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        //开启监控
-        //setForeApp();
-    }
 
     /**
      * 打开app
@@ -60,9 +54,10 @@ public class MonitorService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        startCheck();
         Log.i(TAG, "onStartCommand: -----------进来了");
-        return Service.START_STICKY;
+        startCheck();
+      //  return Service.START_STICKY;
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
@@ -78,19 +73,13 @@ public class MonitorService extends Service {
 
 
     private void startCheck() {
-        if (timer == null) {
-            timer = new Timer();
+
+        Boolean isForeground = BackgroundUtil.getLinuxCoreInfo(getApplicationContext(), PACKAGE_NAME);
+        Log.i(TAG, "isForeground----: " + isForeground);
+        if (!isForeground) {
+            startApp(PACKAGE_NAME);
         }
-        TimerTask task = new TimerTask() {
-            public void run() {
-                Boolean isForeground = BackgroundUtil.getLinuxCoreInfo(getApplicationContext(), PACKAGE_NAME);
-                Log.i(TAG, "isForeground----: " + isForeground);
-                if (!isForeground) {
-                    startApp(PACKAGE_NAME);
-                }
-            }
-        };
-        timer.schedule(task, 10 * 1000, 30 * 1000);
+
     }
 
 }

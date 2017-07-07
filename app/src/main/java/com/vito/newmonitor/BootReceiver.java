@@ -33,14 +33,11 @@ public class BootReceiver extends BroadcastReceiver {
 //
 //            Toast.makeText(context, "有应用被添加", Toast.LENGTH_LONG).show();
 //        }
-//        if(intent.getAction().equals(Intent.ACTION_PACKAGE_REMOVED)){
-//            if (mManager == null) {
-//                mManager = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
-//            }
-//            mManager.killBackgroundProcesses(MonitorService.PACKAGE_NAME);
-//
-//            Toast.makeText(context, "有应用被删除", Toast.LENGTH_LONG).show();
-//        }
+
+        if(intent.getAction().equals("com.vito.newmonitor")){
+            AlarmManagerUtils.cancelMonitor(context);
+            Toast.makeText(context, "接收暂停监控广播", Toast.LENGTH_LONG).show();
+        }
 
 
 
