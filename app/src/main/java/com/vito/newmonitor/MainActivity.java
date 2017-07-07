@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initView();
         startByNormallService();
-        getMessage(this);
+
     }
 
     private void initView() {
@@ -48,24 +48,16 @@ public class MainActivity extends AppCompatActivity {
         return versionName;
     }
 
-    /**
-     * 查询手机内非系统应用
-     * @param context
-     * @return
-     */
-    public AppBean getMessage(Context context) {
-        PackageManager pManager = context.getPackageManager();
-        AppBean appBean = new AppBean();
-        try {
-            PackageInfo packageInfo = pManager.getPackageInfo(MonitorService.PACKAGE_NAME, PackageManager.GET_CONFIGURATIONS);
-            Log.i(TAG, "getMessage: ----versionCode"+packageInfo.versionCode+"----versionName:"+packageInfo.versionName+"-------packageName:"+packageInfo.packageName);
-            appBean.setVersionCode(packageInfo.versionCode);
-            appBean.setVersionName(packageInfo.versionName);
-            appBean.setPackageName(packageInfo.packageName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return appBean;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startApp("com.smates.selfservice");
     }
 
+    protected void startApp(String packageName) {
+        PackageManager pm = getPackageManager();
+        Intent launchIntentForPackage = pm.getLaunchIntentForPackage(packageName);
+        if (launchIntentForPackage != null)
+            startActivity(launchIntentForPackage);
+    }
 }

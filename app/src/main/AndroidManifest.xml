@@ -32,7 +32,7 @@
 
 
         <receiver android:name=".BootReceiver">
-            <intent-filter android:priority="1000">
+            <intent-filter android:priority="100">
                 <!--注册开机广播地址-->
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>
                 <category android:name="android.intent.category.DEFAULT"/>

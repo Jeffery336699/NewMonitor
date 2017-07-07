@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.wenming.library.BackgroundUtil;
 import com.wenming.library.processutil.models.AndroidAppProcess;
 
 import java.io.File;
@@ -23,7 +24,6 @@ public class MonitorService extends Service {
 
     private static String TAG = "MonitorService";
     private Timer timer;
-    //    public final static String  PACKAGE_NAME = "com.example.ling.installtestdemo";
     public final static String PACKAGE_NAME = "com.smates.selfservice";
     public static final String monitorFile   = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "read.txt";
     public static final String START_MONITOR = "startMonitor";
@@ -39,55 +39,9 @@ public class MonitorService extends Service {
     public void onCreate() {
         super.onCreate();
         //开启监控
+
         setForeApp();
     }
-
-    public List<AndroidAppProcess> getRunningForegroundApps(Context ctx) {
-        List<AndroidAppProcess> processes = new ArrayList<>();
-        File[] files = new File("/proc").listFiles();
-        PackageManager pm = ctx.getPackageManager();
-        for (File file : files) {
-            if (file.isDirectory()) {
-                int pid;
-                try {
-                    pid = Integer.parseInt(file.getName());
-                } catch (NumberFormatException e) {
-                    continue;
-                }
-                try {
-                    AndroidAppProcess process = new AndroidAppProcess(pid);
-                    if (process.foreground
-                            && (process.uid < 1000 || process.uid > 9999)
-                            && !process.name.contains(":")
-                            && pm.getLaunchIntentForPackage(process.getPackageName()) != null) {
-                        processes.add(process);
-                    }
-                } catch (AndroidAppProcess.NotAndroidAppProcessException ignored) {
-                } catch (IOException e) {
-                    Log.e(TAG, pid + "");
-
-                }
-            }
-        }
-        return processes;
-    }
-
-    /**
-     * 把process进程信息保存在/proc目录下，使用Shell命令去获取的他，再根据进程的属性判断是否为前台
-     *
-     * @param packageName 需要检查是否位于栈顶的App的包名
-     */
-    public boolean getLinuxCoreInfo(Context context, String packageName) {
-
-        List<AndroidAppProcess> processes = getRunningForegroundApps(context);
-        for (AndroidAppProcess appProcess : processes) {
-            if (appProcess.getPackageName().equals(packageName) && appProcess.foreground) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     /**
      * 打开app
@@ -146,7 +100,7 @@ public class MonitorService extends Service {
                 if (STOP_MONITOR.equals(s)){//表示是操作人员退出的,不做一体机前后台监控
                     return;
                 }
-                Boolean isForeground = getLinuxCoreInfo(getApplicationContext(), PACKAGE_NAME);
+                Boolean isForeground = BackgroundUtil.getLinuxCoreInfo(getApplicationContext(), PACKAGE_NAME);
                 Log.i(TAG, "isForeground----: " + isForeground);
                 if (!isForeground) {
                     startApp(PACKAGE_NAME);
