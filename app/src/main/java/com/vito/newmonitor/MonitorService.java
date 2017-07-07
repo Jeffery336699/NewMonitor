@@ -5,13 +5,11 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.wenming.library.BackgroundUtil;
 
-import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -24,7 +22,6 @@ public class MonitorService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -86,7 +83,6 @@ public class MonitorService extends Service {
         }
         TimerTask task = new TimerTask() {
             public void run() {
-
                 Boolean isForeground = BackgroundUtil.getLinuxCoreInfo(getApplicationContext(), PACKAGE_NAME);
                 Log.i(TAG, "isForeground----: " + isForeground);
                 if (!isForeground) {
@@ -94,7 +90,7 @@ public class MonitorService extends Service {
                 }
             }
         };
-        timer.schedule(task, 10 * 1000, 10 * 1000);
+        timer.schedule(task, 10 * 1000, 30 * 1000);
     }
 
 }
