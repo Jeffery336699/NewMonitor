@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 super.run();
+                Log.d(TAG,"可见");
                 SystemClock.sleep(5000);
                 startApp("com.smates.selfservice");
             }
