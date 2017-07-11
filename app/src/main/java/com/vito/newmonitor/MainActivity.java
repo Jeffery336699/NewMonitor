@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         mTv = (TextView) findViewById(R.id.tv);
-        mTv.setText("自助终端监控 "+getVersionName());
+        mTv.setText("自助终端监控 " + getVersionName());
     }
 
     public void startByNormallService() {
@@ -44,21 +44,22 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Log.i(TAG, "getVersionName: "+versionName);
+        Log.i(TAG, "getVersionName: " + versionName);
         return versionName;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        AlarmManagerUtils.startMonitor(getApplicationContext());
-        new Thread(){
+
+        new Thread() {
             @Override
             public void run() {
                 super.run();
-                Log.d(TAG,"可见");
+                Log.d(TAG, "可见");
                 SystemClock.sleep(5000);
                 startApp("com.smates.selfservice");
+                AlarmManagerUtils.startMonitor(getApplicationContext());
             }
         }.start();
 
