@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
-        startByNormallService();
+       // startByNormallService();
 
     }
 
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 super.run();
                 Log.d(TAG, "可见");
-                SystemClock.sleep(5000);
+                SystemClock.sleep(10000);
                 startApp("com.smates.selfservice");
                 AlarmManagerUtils.startMonitor(getApplicationContext());
             }
